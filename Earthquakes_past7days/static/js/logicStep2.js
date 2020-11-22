@@ -5,7 +5,7 @@ console.log("working");
 //let map = L.map('mapid').setView([44.0, -80.0], 2);
 
 // Get data from cities.js
-//let cityData = cities;
+let cityData = cities;
 
 // Add GeoJSON data.
 ////let sanFranAirport =
@@ -58,8 +58,8 @@ console.log("working");
 //L.circleMarker(cityData.location, {
   //color: "black",
   //fillColor: "#FFA500",
-  //lineweight: 4,
-  //radius: 300
+ // lineweight: 4,
+  //radius: feature.properties.mag,
  //}).addTo(map);
 
 // We create the tile layer that will be the background of our map.
@@ -107,24 +107,53 @@ let myStyle = {
 
 // Grabbing our GeoJSON data.
 d3.json(earthquakes).then(function(data) {
+
+        // This function determines the radius of the earthquake marker based on its magnitude.
+// Earthquakes with a magnitude of 0 will be plotted with a radius of 1.
+function getRadius(magnitude) {
+  if (magnitude === 0) {
+    return 1;
+  }
+  return magnitude * 4;
+};
+// This function returns the style data for each of the earthquakes we plot on
+// the map. We pass the magnitude of the earthquake into a function
+// to calculate the radius.
+function styleInfo(feature) {
+  return {
+    opacity: 1,
+    fillOpacity: 1,
+    fillColor: "#ffae42",
+    color: "#000000",
+    radius: getRadius(feature.properties.mag),
+    stroke: true,
+    weight: 0.5
+  };
+};
   console.log(data);
 
 // Creating a GeoJSON layer with the retrieved data.
-L.geoJson(data).addTo(map);
-
+//L.geoJson(data).addTo(map);
 
  //Grabbing our GeoJSON data.
-//L.geoJson(data, {
-  //style: myStyle,
-  //color: "#0000FF",
-  //weight: 2,
-  //We turn each feature into a marker on the map.
- // onEachFeature: function(feature, layer) {
+L.geoJson(data, {   
+ // style: myStyle,
+  //color: "#05B4FF",
+  //fillcolor:"#F7FF08",
+  //weight: 1,
+  //opacity: 2.0,
+  //We turn each feature into a circleMarker on the map.
+
+  pointToLayer: function(feature,latlng) {
+    console.log(data);
+    return L.circleMarker(latlng);
+  },
+  style: styleInfo
+  //onEachFeature: function(feature, layer) {
    // console.log(layer);
       //layer.bindPopup("<h3>Neighborhood: " + feature.properties.AREA_NAME + "</h3> ");
   
- // }
-
-//}).addTo(map);
+  //}
+}).addTo(map);
 
 });
